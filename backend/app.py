@@ -12,7 +12,7 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-host = 'http://4.145.107.27:80'  # Địa chỉ server trọng tài mặc định
+host = 'http://127.0.0.1:80'  # Địa chỉ server trọng tài mặc định
 team_id = 123  # team_id mặc định
 game_info = {}  # Thông tin trò chơi để hiển thị trên giao diện
 stop_thread = False  # Biến dùng để dừng thread lắng nghe
@@ -42,10 +42,12 @@ class GameClient:
             time.sleep(3)
             print(f'Init: {self.init}')
 
-            # Nếu chưa kết nối thì gửi yêu cầu kết nối
+            # Nếu khởi tạo kết nối thì gửi yêu cầu kết nối
             if not self.init:
+                # Mục đích cái này chỉ để tạo phòng thôi
                 response = self.send_init()
             else:
+                # Cập nhật thông tin phòng
                 response = self.fetch_game_info()
             # print(response.content)
             # Lấy thông tin trò chơi từ server trọng tài và cập nhật vào game_info
@@ -67,6 +69,7 @@ class GameClient:
 
             # Nhận thông tin trò chơi
             elif data.get("board") and data.get("status") is None:
+                # status = None tức là chưa kết thúc ván game
                 # Nếu là lượt đi của đội của mình thì gửi nước đi             
                 log_game_info()
                 if data.get("turn") in self.team_id:
@@ -102,7 +105,7 @@ class GameClient:
         requests.post(self.server_url + "/move", json=game_info, headers=headers)
 
     def send_init(self):
-        # Gửi yêu cầu kết nối đến server trọng tài
+        # Gửi yêu cầu tạo phòng (nếu chưa có) đến server trọng tài
         init_info = {
             "room_id": self.room_id,
             "team1_id": self.your_team_id,
@@ -164,7 +167,7 @@ def get_data():
 if __name__ == "__main__":
     # Lấy địa chỉ server trọng tài từ người dùng
     # host = input("Enter server url: ")
-    host = "http://4.145.107.27:80"
+    host = "http://127.0.0.1:80"
     room_id = input("Enter room id: ")
     your_team_id = input("Enter your team id: ")
     opponent_team_id = input("Enter opponent team id: ")

@@ -63,14 +63,23 @@ for i in range(size):
 @app.route('/init', methods=['POST'])
 @cross_origin()
 def get_data():
+    '''
+    data có dạng:
+    init_info = {
+            "room_id": self.room_id,
+            "team1_id": self.your_team_id,
+            "team2_id": self.opponent_team_id,
+            "init": True
+        }
+    '''
     log("/init")
     data = request.data
-    info = json.loads(data.decode('utf-8'))
+    info = json.loads(data.decode('utf-8'))  # load data lên thành dictionary tên info
     log(info)
-    global rooms
+    global rooms    # tham chiếu đến biến room bên ngoài
     global room_by_teams
     room_id = info["room_id"]
-    is_init = False
+    is_init = info["init"]
     if room_id not in rooms:
         match_id = 1
         team1_id = info["team1_id"]
@@ -79,8 +88,8 @@ def get_data():
         team2_id_full = team2_id + "+" + team2_role
         room_by_teams[team1_id] = room_id
         room_by_teams[team2_id] = room_id
-        board_game = BoardGame(size, BOARD, room_id, match_id, team1_id_full, team2_id_full)
-        rooms[room_id] = board_game
+        board_game = BoardGame(size, BOARD, room_id, match_id, team1_id_full, team2_id_full)    # khởi tạo bàn game
+        rooms[room_id] = board_game     # gán bàn game cho từng phòng
         is_init = True
 
     board_game = rooms[room_id]
@@ -97,6 +106,14 @@ def get_data():
 @app.route('/', methods=['POST'])
 @cross_origin()
 def render_board():
+    '''
+    data có dạng:
+    request_info = {
+            "room_id": self.room_id,
+            "team_id": self.team_id,
+            "match_id": self.match_id
+        }
+    '''
     data = request.data
     info = json.loads(data.decode('utf-8'))
     log(info['team_id'])
