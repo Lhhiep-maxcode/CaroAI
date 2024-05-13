@@ -7,6 +7,7 @@ from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS, cross_origin
 
 from TicTacToeAi import get_move
+import human
 
 app = Flask(__name__)
 cors = CORS(app)
